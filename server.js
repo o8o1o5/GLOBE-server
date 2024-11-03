@@ -16,15 +16,15 @@ app.use(bodyParser.json());
 
 // DB 연결
 mongoose
-  .connect("mongodb://localhost:27017/onyu", {
+  .connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("Succesfully connected to database");
+    console.log("Connected to MongoDB Atlas");
   })
   .catch((err) => {
-    console.log("Failed to connect database");
+    console.log("MongoDB connection error:", err);
   });
 
 // 테스트용 get
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// 게시물 post
+// 게시물
 app.post("/posts", async (req, res) => {
   const { title, content } = req.body;
 
@@ -46,9 +46,34 @@ app.post("/posts", async (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
+  const { id } = req?.query;
+
+  if (id) {
+    try {
+      const post = await Post.findById(id);
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    try {
+      const posts = await Post.find();
+      res.json(posts);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+});
+
+app.delete("/posts", async (req, res) => {
+  const { id } = req.query;
+
   try {
-    const posts = await Post.find();
-    res.json(posts);
+    const deletedPost = await Post.findByIdAndDelete(id);
+    if (!deletedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    res.status(200).json({ message: "Post deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
