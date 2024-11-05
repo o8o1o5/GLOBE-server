@@ -46,22 +46,20 @@ app.post("/posts", async (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
-  const { id } = req?.query;
+  const { id, search } = req.query;
 
-  if (id) {
-    try {
-      const post = await Post.findById(id);
-      res.json(post);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+  try {
+    let posts;
+    if (id) {
+      posts = await Post.findById(id);
+    } else if (search) {
+      posts = await Post.find({ title: { $regex: search, $options: "i" } });
+    } else {
+      posts = await Post.find();
     }
-  } else {
-    try {
-      const posts = await Post.find();
-      res.json(posts);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
