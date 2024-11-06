@@ -1,1 +1,3 @@
-# fucking shit backend
+# TO THE GLOBE!
+
+## GLOBE server (BE)
