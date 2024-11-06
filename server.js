@@ -79,5 +79,5 @@ app.delete("/posts", async (req, res) => {
 
 // 구동
 app.listen(3000, () => {
-  console.log(`Server listening on ${process.env.PORT}`);
+  console.log(`Server listening on 3000`);
 });
