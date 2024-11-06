@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 // DB 연결
 mongoose
-  .connect(3000, {
+  .connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -78,6 +78,6 @@ app.delete("/posts", async (req, res) => {
 });
 
 // 구동
-app.listen(process.env.PORT, () => {
+app.listen(3000, () => {
   console.log(`Server listening on ${process.env.PORT}`);
 });
