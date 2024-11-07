@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 
 // 스키마
 const Post = require("./models/post");
+const User = require("./models/user");
 
 // 설정
 require("dotenv").config();
@@ -33,18 +34,6 @@ app.get("/", (req, res) => {
 });
 
 // 게시물
-app.post("/posts", async (req, res) => {
-  const { title, content } = req.body;
-
-  const newPost = new Post({ title, content });
-  try {
-    const savedPost = await newPost.save();
-    res.status(201).json(savedPost);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 app.get("/posts", async (req, res) => {
   const { id, search } = req.query;
 
@@ -63,6 +52,18 @@ app.get("/posts", async (req, res) => {
   }
 });
 
+app.post("/posts", async (req, res) => {
+  const { title, content } = req.body;
+
+  const newPost = new Post({ title, content });
+  try {
+    const savedPost = await newPost.save();
+    res.status(201).json(savedPost);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.delete("/posts", async (req, res) => {
   const { id } = req.query;
 
@@ -72,6 +73,36 @@ app.delete("/posts", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
     res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 유저
+app.post("/users", async (req, res) => {
+  const { userId, userPassword } = req.body;
+
+  const newUser = new User({ userId, userPassword });
+  try {
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/users/login", async (req, res) => {
+  const { userId, userPassword } = req.body;
+
+  console.log(userId, userPassword);
+
+  try {
+    const user = await User.findOne({ userId, userPassword });
+    if (!user) {
+      return res.status(401).json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    res.status(200).json({ message: "로그인 성공!", userId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
